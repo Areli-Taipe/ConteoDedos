@@ -5,9 +5,9 @@ const fingerCountDisplay = document.getElementById('fingerCount');
 
 let hands;  
 
-function setupCamera() {  
+async function setupCamera() {  
     return navigator.mediaDevices.getUserMedia({ video: true })  
-        .then(function(stream) {  
+        .then((stream) => {  
             video.srcObject = stream;  
             return new Promise((resolve) => {  
                 video.onloadedmetadata = () => { resolve(video); };  
@@ -17,7 +17,7 @@ function setupCamera() {
 
 function countFingers(hand) {  
     let fingers = 0;  
-    const tipIds = [4, 8, 12, 16, 20]; // ID de los puntos de los dedos  
+    const tipIds = [4, 8, 12, 16, 20]; // IDs de los puntos de los dedos  
 
     tipIds.forEach((tipId, index) => {  
         const tipY = hand.landmark[tipId].y;  
@@ -45,7 +45,8 @@ async function main() {
     function detectHands() {  
         context.drawImage(video, 0, 0, canvas.width, canvas.height);  
 
-        const image = new cv.Mat(canvas.height, canvas.width, cv.CV_8UC4);  
+        // Obtener la imagen del canvas para procesarla  
+        const image = cv.imread(canvas);  
         const results = hands.process(image);  
 
         if (results.multiHandLandmarks) {  
@@ -55,6 +56,7 @@ async function main() {
             });  
         }  
 
+        image.delete(); // Limpiar memoria  
         requestAnimationFrame(detectHands);  
     }  
 
